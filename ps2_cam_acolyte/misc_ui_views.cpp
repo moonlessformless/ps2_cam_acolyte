@@ -37,6 +37,6 @@ void about_ui_view::draw_tool()
 	ImGui::Text("PS2 Cam Acolyte v%d.%02d", current_version.major, current_version.minor);
     if (ImGui::Button("Check for Newer Version"))
     {
-        OsOpenInShell("https://github.com");
+        OsOpenInShell("https://github.com/moonlessformless/ps2_cam_acolyte/releases");
     }
 }
