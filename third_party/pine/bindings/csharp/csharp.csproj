@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+<PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
+  <DefineConstants>_WINDOWS</DefineConstants>
+</PropertyGroup>
+
+<PropertyGroup Condition=" '$(OS)' == 'OSX' ">
+  <DefineConstants>_OSX</DefineConstants>
+</PropertyGroup>
+
+<PropertyGroup Condition=" '$(OS)' == 'Unix' ">
+  <DefineConstants>_UNIX</DefineConstants>
+</PropertyGroup>
+
+
+
+</Project>

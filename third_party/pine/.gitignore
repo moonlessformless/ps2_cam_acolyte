@@ -1,0 +1,14 @@
+client
+html/*
+latex/*
+release/*
+release.zip
+.venv/*
+*.o
+*.so
+*.dll
+build/
+bin/
+obj/
+target/
+Cargo.lock

@@ -1,0 +1,16 @@
+---
+BasedOnStyle: LLVM 
+AllowShortBlocksOnASingleLine: 'true'
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
+Cpp11BracedListStyle: 'false'
+IndentWidth: '4'
+SortIncludes: 'true'
+SpacesInCStyleCastParentheses: 'false'
+SpacesInContainerLiterals: 'false'
+SpacesInParentheses: 'false'
+UseTab: Never
+AlwaysBreakTemplateDeclarations: 'Yes'
+IndentCaseLabels: 'true'
+
+...
