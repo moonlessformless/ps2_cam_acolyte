@@ -1,8 +1,8 @@
-**PS2 Cam Acolyte**
+# **PS2 Cam Acolyte**
 
 This is a lightweight Windows exe for using camera hacks and other cheats/debugging tools on PS2 games running on the PCSX2 emulator. Just run ps2_cam_acolyte.exe while playing a game in PS2, connect a second controller and use it to fly the camera around, enable/disable lighting, etc.
 
-**Game Support**
+### **Game Support**
 
 Support is currently focused on PS2 horror games(in particular early prototypes), and will expand over time. Every game supports a free cam mode, but some games have other cheats or debugging tools such as disabling shadows or pausing gameplay.
 
@@ -16,9 +16,11 @@ Support is currently focused on PS2 horror games(in particular early prototypes)
 
 Additional games and functionality for existing games will be added over time.
 
-**Installation**
+### **Installation**
 
 Download the latest zip from the Releases, unzip into a directory of your choosing and double-click the .exe.
+
+You may see a "Windows protected your PC" pop up about it being an unrecognized app - this is just because it's unsigned code. You can click More info -> Run anyway.
 
 If you're upgrading from a previous version, copy over the preferences.ini from the last version.
 
@@ -35,15 +37,19 @@ If you're upgrading from a previous version, copy over the preferences.ini from 
 9. Start exploring the game world!
 10. Your preferences, i.e. controller selection, are stored in preferences.ini next to the executable
 
-**Troubleshooting**
+### Troubleshooting
 
 *Q*: It just says 'Connecting to PCSX2...'
 
 *A*: Ensure PCSX2 is running, it's a version newer than v1.7.2864, PINE is enabled in PCSX2 Settings -> Advanced -> PINE Settings and the slot is set to the default of 28011.
 
-Q: It says [XXXXXXXX] Unsupported Game
+*Q:* It says [XXXXXXXX] Unsupported Game
 
-A: PS2 Cam Acolyte only supports the games listed in the table above. Some games have multiple regions or versions - the UUID needs to match exactly. The [XXXXXXXX] is the UUID of the current unsupported game.
+*A:* PS2 Cam Acolyte only supports the games listed in the table above. Some games have multiple regions or versions - the UUID needs to match exactly. The [XXXXXXXX] is the UUID of the current unsupported game.
+
+*Q:* The exe is flagged as containing "Win32/Wacatac.H!ml" or "Variant.Lazy.432226" by my virus software
+
+*A:* If your Windows Defender definitions are up to date, it should scan clean, but may trigger on older definitions or other antivirus software. Since it opens a IPC socket to talk to PCSX2 and contains a bunch of hardcoded hex values, it's easy to see why it might look suspicious to an antivirus. I have submitted the exe to several places, i.e. Bitdefender, as a false positive, so perhaps it will clear up in time. If you're concerned, you can inspect the code and build it yourself.
 
 **About the Code**
 
@@ -60,7 +66,15 @@ PCSX2 can be quite resource intensive, so some care has been taken to keep PS2 C
 * Updates logic/commands at a maximum of 100hz and sleeps otherwise
 * Draws only when input is received, and only at a maximum of 60hz
 
-**Future Work**
+### **Building**
+
+Building should be as simple as opening the project in Visual Studio and building for Debug or Release. Please create an issue if you run into problems. You will need to copy these two files to the output exe directory:
+
+third_party/sdl_gamecontrollerdb/gamecontrollerdb.txt
+
+third_party/sdl2/lib/x64/SDL2.dll
+
+### **Future Work**
 
 * Support for more games: Haunting Ground, Silent Hill 3 & 4, Kuon (shipping version), etc.
 * Reading PNACH cheat files and turning them into toggleable/bindable values using comments(i.e. // disable lighting(Y) would bind the Y button to all subsequent written values)
@@ -68,7 +82,7 @@ PCSX2 can be quite resource intensive, so some care has been taken to keep PS2 C
 * Record/playback smoothed camera inputs to help content creators create higher quality video essays, etc.
 * A fully allocation free IPC command queue - currently it uses the stock PINE implementation, which has a few API wrinkles that make this impossible
 
-**Contributors**
+### **Contributors**
 
 Pull requests are welcome so long as the following requirements are respected:
 
@@ -76,7 +90,7 @@ Pull requests are welcome so long as the following requirements are respected:
 * No memory leaks when starting, playing or stopping a game
 * CPU/GPU usage remains 0% when not doing anything and under 0.5% when steering cameras on my system when I test it
 
-**Support**
+### **Support**
 
 If you like this tool, you can support it by trying the demo for my game:
 
