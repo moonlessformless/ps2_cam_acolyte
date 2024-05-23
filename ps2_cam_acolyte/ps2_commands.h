@@ -176,6 +176,18 @@ public:
 		read_all.finalize();
 	}
 
+	read_only_value_set(const pcsx2& ps2, uint32_t base_address)
+		: ps2(ps2)
+		, read_all(ps2)
+	{
+		for (int i = 0; i < N; ++i)
+		{
+			v[i].address = base_address + i * sizeof(T);
+			v[i].read_cmd = read_all.queue_read<T>(v[i].address);
+		}
+		read_all.finalize();
+	}
+
 	void update()
 	{
 		read_all.send();
@@ -268,7 +280,7 @@ public:
 
 	void toggle_tweaking()
 	{
-		if (is_tweaking) stop_tweaking(ps2);
+		if (is_tweaking) stop_tweaking(true);
 		else start_tweaking();
 	}
 

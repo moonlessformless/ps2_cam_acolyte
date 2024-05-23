@@ -6,7 +6,7 @@
 #include "glm/vec3.hpp"
 #include "glm/geometric.hpp"
 
-class shared_utils
+class shared_camera
 {
 public:
 	static glm::vec3 compute_freecam_pos_delta(const controller_state& c, glm::vec2 move_joystick_scale,

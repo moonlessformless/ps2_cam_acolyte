@@ -1,4 +1,5 @@
 #include "shared_silent_hill_2.h"
+#include "shared_ui.h"
 #include <iostream>
 
 class silent_hill_2_directors_cut : public ps2_game
@@ -93,12 +94,12 @@ public:
 		sentinel.increment();
 	}
 
-	void draw_game_ui() override
+	void draw_game_ui(const pcsx2& ps2, const controller& c, playback& camera_playback) override
 	{
 		ImGui::PushTextWrapPos(0.0f); ImGui::TextColored(ui_colors::help, "Note: the freecam behaves oddly during cutscenes but can still be moved."); ImGui::PopTextWrapPos();
-		ImGui::Text("Freecam (A): "); ImGui::SameLine();
+		shared_ui::button(c, controller_bindings::freecam); ImGui::SameLine(); ImGui::Text("Freecam: "); ImGui::SameLine();
 		ImGui::TextColored(freecam_mode == freecam_mode_type::camera ? ui_colors::on_obvious : ui_colors::off_obvious, freecam_mode == freecam_mode_type::camera ? "ON" : "OFF");
-		ImGui::Text("Move James (B): "); ImGui::SameLine();
+		shared_ui::button(c, controller_bindings::special); ImGui::SameLine(); ImGui::Text("Move James: "); ImGui::SameLine();
 		ImGui::TextColored(freecam_mode == freecam_mode_type::james ? ui_colors::on_obvious : ui_colors::off_obvious, freecam_mode == freecam_mode_type::james ? "ON" : "OFF");
 		ImGui::NewLine();
 
@@ -112,7 +113,7 @@ public:
 		}
 	}
 
-	void update(const pcsx2& ps2, const controller_state& c, float time_delta) override
+	void update(const pcsx2& ps2, const controller_state& c, playback& camera_playback, float time_delta) override
 	{
 		if (sentinel.has_reset())
 		{
@@ -123,13 +124,13 @@ public:
 			freecam_mode = freecam_mode_type::none;
 		}
 
-		if (c.button_down(button_type::BUTTON_B))
+		if (c.button_down(controller_bindings::special))
 		{
 			if (freecam_mode == freecam_mode_type::james) freecam_mode = freecam_mode_type::none;
 			else freecam_mode = freecam_mode_type::james;
 			sync_freecam_mode(ps2);
 		}
-		if (c.button_down(button_type::BUTTON_A))
+		if (c.button_down(controller_bindings::freecam))
 		{
 			if (freecam_mode == freecam_mode_type::camera) freecam_mode = freecam_mode_type::none;
 			else freecam_mode = freecam_mode_type::camera;

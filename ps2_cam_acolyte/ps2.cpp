@@ -6,8 +6,9 @@
 #include <unistd.h>
 #include <memory>
 
-pcsx2::pcsx2()
+pcsx2::pcsx2(const controller* controller)
     : ipc(new PINE::PCSX2())
+    , controller_ptr(controller)
 {
     last_update_time = clock.now();
     status.state = connection_status::connected_state::connecting;
@@ -54,7 +55,7 @@ void pcsx2::determine_game()
     }
 }
 
-void pcsx2::update(const controller_state& c)
+bool pcsx2::update()
 {
     auto now = clock.now();
     auto elapsed = now - last_update_time;
@@ -71,7 +72,16 @@ void pcsx2::update(const controller_state& c)
 
     if (current_game)
     {
-        current_game->update(*this, c, time_delta);
+        current_game->update(*this, controller_ptr->get_state(), camera_playback, time_delta);
+    }
+
+    if (camera_playback.needs_render())
+    {
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
@@ -116,7 +126,7 @@ void pcsx2::draw_tool()
 {
     if (current_game != nullptr)
     {
-        current_game->draw_game_ui();
+        current_game->draw_game_ui(*this, *controller_ptr, camera_playback);
     }
     else
     {

@@ -16,7 +16,7 @@ int main()
     ui_host ui_host;
     ui_main ui_main;
     controller controller(prefs);
-    pcsx2 ps2;
+    pcsx2 ps2(&controller);
 
     game_library_ui_view game_library_ui;
     about_ui_view about_ui_view;
@@ -62,7 +62,10 @@ int main()
             pending_render_frames = 2; // some events take a frame to play out, so request 2 renders
         }
 
-        ps2.update(controller.get_state());
+        if (ps2.update())
+        {
+            pending_render_frames = 2;
+        }
 
         // ensure we never render faster than 60hz to keep the app low profile
         using namespace std::chrono_literals;

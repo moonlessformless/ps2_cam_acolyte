@@ -1,6 +1,7 @@
 #include "../ps2.h"
 #include "../ps2_commands.h"
-#include "shared_utils.h"
+#include "shared_camera.h"
+#include "shared_ui.h"
 #include "glm/trigonometric.hpp"
 #include "glm/vec3.hpp"
 #include "glm/geometric.hpp"
@@ -20,13 +21,6 @@ class rule_of_rose : public ps2_game
 
 	static constexpr int camera_true_yaw = 0;
 	static constexpr int camera_true_pitch = 1;
-
-	enum class freecam_mode_type
-	{
-		none,
-		camera
-	};
-	freecam_mode_type freecam_mode = freecam_mode_type::none;
 
 public:
 	explicit rule_of_rose(const pcsx2& ps2)
@@ -59,7 +53,7 @@ public:
 	}
 
 
-	void update(const pcsx2& ps2, const controller_state& c, float time_delta) override
+	void update(const pcsx2& ps2, const controller_state& c, playback& camera_playback, float time_delta) override
 	{
 		if (sentinel.has_reset())
 		{
@@ -67,31 +61,15 @@ public:
 			speed_flag.reset();
 		}
 
-		if (c.button_down(button_type::BUTTON_X))
+		if (c.button_down(controller_bindings::pause))
 		{
 			speed_flag.toggle();
 			sentinel.increment();
 		}
 
-		if (c.button_down(button_type::BUTTON_A))
+		if (c.button_down(controller_bindings::freecam))
 		{
-			if (freecam_mode == freecam_mode_type::camera) freecam_mode = freecam_mode_type::none;
-			else freecam_mode = freecam_mode_type::camera;
-
-			if (freecam_mode != freecam_mode_type::none)
-			{
-				if (!camera_values.currently_tweaking())
-				{
-					camera_values.start_tweaking();
-				}
-			}
-			else
-			{
-				if (camera_values.currently_tweaking())
-				{
-					camera_values.stop_tweaking(true);
-				}
-			}
+			camera_values.toggle_tweaking();
 			sentinel.increment();
 		}
 
@@ -109,7 +87,7 @@ public:
 			float current_yaw = camera_values.get(camera_yaw) + true_yaw;
 			float current_pitch = camera_values.get(camera_pitch) + true_pitch;
 
-			glm::vec3 pos_delta = shared_utils::compute_freecam_pos_delta(c, glm::vec2(move_scale, -move_scale), current_yaw, current_pitch);
+			glm::vec3 pos_delta = shared_camera::compute_freecam_pos_delta(c, glm::vec2(move_scale, -move_scale), current_yaw, current_pitch);
 
 			camera_values.add(camera_forward, pos_delta.x);
 			camera_values.add(camera_up, -pos_delta.y);
@@ -119,7 +97,7 @@ public:
 		}
 	}
 
-	void draw_game_ui() override
+	void draw_game_ui(const pcsx2& ps2, const controller& c, playback& camera_playback) override
 	{
 		const char* speed_description = nullptr;
 		switch (speed_flag.current_index())
@@ -128,9 +106,9 @@ public:
 			case 1: speed_description = "Paused"; break;
 			case 2: speed_description = "Fast"; break;
 		}
-		ImGui::Text("Freecam (A): "); ImGui::SameLine();
-		ImGui::TextColored(freecam_mode == freecam_mode_type::camera ? ui_colors::on_obvious : ui_colors::off_obvious, freecam_mode == freecam_mode_type::camera ? "ON" : "OFF");
-		ImGui::Text("Movement Speed (X): "); ImGui::SameLine();
+		shared_ui::button(c, controller_bindings::freecam); ImGui::SameLine(); ImGui::Text("Freecam: "); ImGui::SameLine();
+		ImGui::TextColored(camera_values.currently_tweaking() ? ui_colors::on_obvious : ui_colors::off_obvious, camera_values.currently_tweaking() ? "ON" : "OFF");
+		shared_ui::button(c, controller_bindings::pause); ImGui::SameLine(); ImGui::Text("Movement Speed: "); ImGui::SameLine();
 		ImGui::TextColored(speed_flag.current_index() > 0 ? ui_colors::warning : ui_colors::off_obvious, speed_description);
 	}
 };

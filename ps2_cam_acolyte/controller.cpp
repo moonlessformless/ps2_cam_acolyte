@@ -6,6 +6,110 @@
 #include <atomic>
 #include <syncstream>
 
+const char* default_button_type_names[] = {
+    "Invalid",
+    "A",
+    "B",
+    "X",
+    "Y",
+    "Back",
+    "Guide",
+    "Start",
+    "Left Stick",
+    "Right Stick",
+    "Left Shoulder",
+    "Right Shoulder",
+    "Up",
+    "Down",
+    "Left",
+    "Right",
+    "Misc 1",
+    "Paddle 1",
+    "Paddle 2",
+    "Paddle 3",
+    "Paddle 4",
+    "Touchpad",
+    "BUTTON_MAX"
+};
+
+const char* xbox_button_type_names[] = {
+    "Invalid",
+    "A",
+    "B",
+    "X",
+    "Y",
+    "Back",
+    "Guide",
+    "Start",
+    "Left Stick",
+    "Right Stick",
+    "LB",
+    "RB",
+    "Up",
+    "Down",
+    "Left",
+    "Right",
+    "Misc 1",
+    "Paddle 1",
+    "Paddle 2",
+    "Paddle 3",
+    "Paddle 4",
+    "Touchpad",
+    "BUTTON_MAX"
+};
+
+const char* ps_button_type_names[] = {
+    "Invalid",
+    "Cross",
+    "Circle",
+    "Square",
+    "Triangle",
+    "Select",
+    "Guide",
+    "Start/Options",
+    "Left Stick",
+    "Right Stick",
+    "L1",
+    "R1",
+    "Up",
+    "Down",
+    "Left",
+    "Right",
+    "Misc 1",
+    "Paddle 1",
+    "Paddle 2",
+    "Paddle 3",
+    "Paddle 4",
+    "Touchpad",
+    "BUTTON_MAX"
+};
+
+const char* switch_button_type_names[] = {
+    "Invalid",
+    "B",
+    "A",
+    "Y",
+    "X",
+    "Minus",
+    "Home",
+    "Plus",
+    "Left Stick",
+    "Right Stick",
+    "L",
+    "R",
+    "Up",
+    "Down",
+    "Left",
+    "Right",
+    "Misc 1",
+    "Paddle 1",
+    "Paddle 2",
+    "Paddle 3",
+    "Paddle 4",
+    "Touchpad",
+    "BUTTON_MAX"
+};
+
 controller_state::controller_state()
 {
 }
@@ -212,7 +316,7 @@ void controller::handle_event(const SDL_Event& e)
     }
 }
 
-const controller_state& controller::get_state()
+const controller_state& controller::get_state() const
 {
     return state;
 }
@@ -242,6 +346,30 @@ int controller::get_current_device_index() const
 const std::vector<std::string>& controller::get_device_list() const
 {
     return device_list;
+}
+
+const char* controller::get_button_display_name(button_type type) const
+{
+    int index = (int)type + 1; // invalid is -1
+    if (impl->game_controller != nullptr)
+    {
+        switch (SDL_GameControllerGetType(impl->game_controller))
+        {
+            case SDL_CONTROLLER_TYPE_UNKNOWN: return default_button_type_names[index];
+            case SDL_CONTROLLER_TYPE_XBOX360: return xbox_button_type_names[index];
+            case SDL_CONTROLLER_TYPE_XBOXONE: return xbox_button_type_names[index];
+            case SDL_CONTROLLER_TYPE_PS3: return ps_button_type_names[index];
+            case SDL_CONTROLLER_TYPE_PS4: return ps_button_type_names[index];
+            case SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_PRO:return switch_button_type_names[index];
+            case SDL_CONTROLLER_TYPE_VIRTUAL: return default_button_type_names[index];
+            case SDL_CONTROLLER_TYPE_PS5: return ps_button_type_names[index];
+            default: return default_button_type_names[index];
+        }
+    }
+    else
+    {
+        return default_button_type_names[index];
+    }
 }
 
 bool controller::has_status() const

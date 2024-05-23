@@ -1,5 +1,6 @@
 ﻿#include "shared_silent_hill_2.h"
 #include "imgui.h"
+#include "shared_ui.h"
 #include <iostream>
 
 class silent_hill_prototype : public ps2_game
@@ -92,7 +93,7 @@ public:
 		cmd.send();
 	}
 
-	void draw_game_ui() override
+	void draw_game_ui(const pcsx2& ps2, const controller& c, playback& camera_playback) override
 	{
 		const char* speed_description = nullptr;
 		switch (speed_flag.current_index())
@@ -102,13 +103,13 @@ public:
 			case 2: speed_description = "0.0"; break;
 		}
 		ImGui::PushTextWrapPos(0.0f); ImGui::TextColored(ui_colors::help, "Note: the freecam behaves oddly during cutscenes but can still be moved."); ImGui::PopTextWrapPos();
-		ImGui::Text("Freecam (A): "); ImGui::SameLine();
+		shared_ui::button(c, controller_bindings::freecam); ImGui::SameLine(); ImGui::Text("Freecam: "); ImGui::SameLine();
 		ImGui::TextColored(freecam_mode == freecam_mode_type::camera ? ui_colors::on_obvious : ui_colors::off_obvious, freecam_mode == freecam_mode_type::camera ? "ON" : "OFF");
-		ImGui::Text("Speed (X): "); ImGui::SameLine();
+		shared_ui::button(c, controller_bindings::pause); ImGui::SameLine(); ImGui::Text("Speed: "); ImGui::SameLine();
 		ImGui::TextColored(speed_flag.current_index() > 0 ? ui_colors::warning : ui_colors::off_obvious, speed_description);
-		ImGui::Text("Move James (B): "); ImGui::SameLine();
+		shared_ui::button(c, controller_bindings::special); ImGui::SameLine(); ImGui::Text("Move James: "); ImGui::SameLine();
 		ImGui::TextColored(freecam_mode == freecam_mode_type::james ? ui_colors::on_obvious : ui_colors::off_obvious, freecam_mode == freecam_mode_type::james ? "ON" : "OFF");
-		ImGui::Text("Bright Mode/No Fog (Y): "); ImGui::SameLine();
+		shared_ui::button(c, controller_bindings::lighting); ImGui::SameLine(); ImGui::Text("Bright Mode/No Fog: "); ImGui::SameLine();
 		ImGui::TextColored(brightness_flag.is_on() ? ui_colors::on_obvious : ui_colors::off_obvious, brightness_flag.is_on() ? "ON (flashlight must be off)" : "OFF");
 		ImGui::NewLine();
 		ImGui::PushTextWrapPos(0.0f); ImGui::TextColored(ui_colors::help, "This disables fading out and cutscenes, but may cause issues. Use before entering the apartment fight with Pyramid Head to avoid the COMING SOON blocker."); ImGui::PopTextWrapPos();
@@ -166,7 +167,7 @@ public:
 		sentinel.increment();
 	}
 
-	void update(const pcsx2& ps2, const controller_state& c, float time_delta) override
+	void update(const pcsx2& ps2, const controller_state& c, playback& camera_playback, float time_delta) override
 	{
 		if (sentinel.has_reset())
 		{
@@ -180,24 +181,24 @@ public:
 			freecam_mode = freecam_mode_type::none;
 		}
 
-		if (c.button_down(button_type::BUTTON_X))
+		if (c.button_down(controller_bindings::pause))
 		{
 			speed_flag.toggle();
 			sentinel.increment();
 		}
-		if (c.button_down(button_type::BUTTON_B))
+		if (c.button_down(controller_bindings::special))
 		{
 			if (freecam_mode == freecam_mode_type::james) freecam_mode = freecam_mode_type::none;
 			else freecam_mode = freecam_mode_type::james;
 			sync_freecam_mode(ps2);
 		}
-		if (c.button_down(button_type::BUTTON_A))
+		if (c.button_down(controller_bindings::freecam))
 		{
 			if (freecam_mode == freecam_mode_type::camera) freecam_mode = freecam_mode_type::none;
 			else freecam_mode = freecam_mode_type::camera;
 			sync_freecam_mode(ps2);
 		}
-		if (c.button_down(button_type::BUTTON_Y))
+		if (c.button_down(controller_bindings::lighting))
 		{
 			brightness_flag.toggle();
 			sentinel.increment();

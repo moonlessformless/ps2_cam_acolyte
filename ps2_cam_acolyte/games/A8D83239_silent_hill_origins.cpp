@@ -1,7 +1,8 @@
 ﻿#include "imgui.h"
 #include "../ps2.h"
 #include "../ps2_commands.h"
-#include "shared_utils.h"
+#include "shared_camera.h"
+#include "shared_ui.h"
 #include "glm/trigonometric.hpp"
 #include "glm/vec3.hpp"
 #include "glm/geometric.hpp"
@@ -19,13 +20,6 @@ private:
 	float current_yaw = 0.0f;
 	float current_pitch = 0.0f;
 
-	enum class freecam_mode_type
-	{
-		none,
-		camera
-	};
-	freecam_mode_type freecam_mode = freecam_mode_type::none;
-
 public:
 	explicit silent_hill_origins(const pcsx2& ps2)
 		: sentinel(ps2, 0x01000000)
@@ -35,7 +29,7 @@ public:
 		, brightness_flag(ps2)
 	{
 		camera_flag.edit_off()
-			.write<int32_t>(0x001133DC, 0x0C106574) // jal	pos_004195D0
+			.write<int32_t>(0x001133DC, 0x0C0899E8) // jal	pos_004195D0
 			.finalize();
 		camera_flag.edit_on()
 			.write<int32_t>(0x001133DC, 0x00000000) // jal	pos_004195D0 -> nop
@@ -53,35 +47,31 @@ public:
 			.finalize();
 	}
 
-	void draw_game_ui() override
+	void draw_game_ui(const pcsx2& ps2, const controller& c, playback& camera_playback) override
 	{
-		ImGui::Text("Freecam (A): "); ImGui::SameLine();
-		ImGui::TextColored(freecam_mode == freecam_mode_type::camera ? ui_colors::on_obvious : ui_colors::off_obvious, freecam_mode == freecam_mode_type::camera ? "ON" : "OFF");
-		ImGui::Text("Brightness Boost (X): "); ImGui::SameLine();
-		ImGui::TextColored(brightness_flag.is_on() ? ui_colors::on_obvious : ui_colors::off_obvious, brightness_flag.is_on() ? "ON" : "OFF");
+		shared_ui::toggle(c, controller_bindings::freecam, camera_flag, "Freecam");
+		shared_ui::toggle(c, controller_bindings::lighting, brightness_flag, "Brightness Boost");
 	}
 
-	void update(const pcsx2& ps2, const controller_state& c, float time_delta) override
+	void update(const pcsx2& ps2, const controller_state& c, playback& camera_playback, float time_delta) override
 	{
 		if (sentinel.has_reset())
 		{
+			camera_flag.reset();
 			camera_matrix_1.reset();
 			camera_matrix_2.reset();
-			freecam_mode = freecam_mode_type::none;
+			brightness_flag.reset();
 		}
 
-		if (c.button_down(button_type::BUTTON_X))
+		if (c.button_down(controller_bindings::lighting))
 		{
 			brightness_flag.toggle();
 			sentinel.increment();
 		}
 
-		if (c.button_down(button_type::BUTTON_A))
+		if (c.button_down(controller_bindings::freecam))
 		{
-			if (freecam_mode == freecam_mode_type::camera) freecam_mode = freecam_mode_type::none;
-			else freecam_mode = freecam_mode_type::camera;
-
-			if (freecam_mode != freecam_mode_type::none)
+			if (!camera_flag.is_on())
 			{
 				camera_flag.set_on(true);
 				if (!camera_matrix_1.currently_tweaking())
@@ -111,7 +101,7 @@ public:
 			sentinel.increment();
 		}
 
-		if (freecam_mode == freecam_mode_type::camera)
+		if (camera_flag.is_on())
 		{
 			float turn_scale = time_delta * 3.0f;
 			float move_scale = time_delta * 10.0f;
@@ -133,7 +123,7 @@ public:
 				0.0f, 0.0f, 0.0f, 1.0f
 				});
 
-			glm::vec3 pos_delta = shared_utils::compute_freecam_pos_delta(c, glm::vec2(-move_scale, -move_scale), current_yaw, current_pitch);
+			glm::vec3 pos_delta = shared_camera::compute_freecam_pos_delta(c, glm::vec2(-move_scale, -move_scale), current_yaw, current_pitch);
 
 			glm::mat4 position_mat(1.0f);
 			position_mat[3] = glm::vec4(camera_matrix_1.get(12) + pos_delta.x, camera_matrix_1.get(13) - pos_delta.y, camera_matrix_1.get(14) + pos_delta.z, 1.0f);

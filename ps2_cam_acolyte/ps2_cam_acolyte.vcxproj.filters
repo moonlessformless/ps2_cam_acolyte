@@ -82,6 +82,12 @@
     <ClCompile Include="games\A8D83239_silent_hill_origins.cpp">
       <Filter>Source Files\games</Filter>
     </ClCompile>
+    <ClCompile Include="games\D6C48447_siren.cpp">
+      <Filter>Source Files\games</Filter>
+    </ClCompile>
+    <ClCompile Include="playback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="controller.h">
@@ -984,10 +990,19 @@
     <ClInclude Include="ui_host.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="games\shared_utils.h">
+    <ClInclude Include="games\shared_camera.h">
       <Filter>Source Files\games</Filter>
     </ClInclude>
     <ClInclude Include="version.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="controller_bindings.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="games\shared_ui.h">
+      <Filter>Source Files\games</Filter>
+    </ClInclude>
+    <ClInclude Include="playback.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

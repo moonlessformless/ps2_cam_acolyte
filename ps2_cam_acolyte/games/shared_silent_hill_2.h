@@ -2,7 +2,7 @@
 
 #include "../ps2.h"
 #include "../ps2_commands.h"
-#include "shared_utils.h"
+#include "shared_camera.h"
 #include "glm/trigonometric.hpp"
 #include "glm/vec3.hpp"
 #include "glm/geometric.hpp"
@@ -28,7 +28,7 @@ public:
 		camera_values.add(camera_pitch, -c.get_right_axis().second * turn_scale);
 
 		glm::vec3 forward;
-		glm::vec3 pos_delta = shared_utils::compute_freecam_pos_delta(c, glm::vec2(move_scale, -move_scale), camera_values.get(camera_yaw), camera_values.get(camera_pitch), &forward);
+		glm::vec3 pos_delta = shared_camera::compute_freecam_pos_delta(c, glm::vec2(move_scale, -move_scale), camera_values.get(camera_yaw), camera_values.get(camera_pitch), &forward);
 
 		camera_values.add(camera_x, pos_delta.x);
 		camera_values.add(camera_y, -pos_delta.y);

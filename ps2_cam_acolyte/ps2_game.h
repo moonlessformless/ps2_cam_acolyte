@@ -89,8 +89,8 @@ class ps2_game
 {
 public:
 	virtual ~ps2_game() {}
-	virtual void update(const pcsx2& ps2, const controller_state& state, float time_delta) = 0;
-	virtual void draw_game_ui() {}
+	virtual void update(const pcsx2& ps2, const controller_state& state, playback& camera_playback, float time_delta) = 0;
+	virtual void draw_game_ui(const pcsx2& ps2, const controller& controller, playback& camera_playback) {}
 	ps2_game() = default;
 	ps2_game(const ps2_game&) = delete;
 	ps2_game& operator=(const ps2_game&) = delete;

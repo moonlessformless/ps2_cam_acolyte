@@ -88,10 +88,11 @@ public:
 	~controller();
 	void new_frame();
 	void handle_event(const SDL_Event& event);
-	const controller_state& get_state();
+	const controller_state& get_state() const;
 	void use_device(int index);
 	int get_current_device_index() const;
 	const std::vector<std::string>& get_device_list() const;
+	const char* get_button_display_name(button_type type) const;
 
 	// ui
 	bool has_status() const override;

@@ -1,7 +1,8 @@
 ﻿#include "imgui.h"
 #include "../ps2.h"
 #include "../ps2_commands.h"
-#include "shared_utils.h"
+#include "shared_camera.h"
+#include "shared_ui.h"
 #include "glm/trigonometric.hpp"
 #include "glm/vec3.hpp"
 #include "glm/geometric.hpp"
@@ -14,13 +15,6 @@ private:
 	toggle_state camera_flag;
 	tweakable_value_set<float, 5> camera_values;
 	toggle_state pause_flag;
-
-	enum class freecam_mode_type
-	{
-		none,
-		camera
-	};
-	freecam_mode_type freecam_mode = freecam_mode_type::none;
 
 	static constexpr int camera_pitch = 0;
 	static constexpr int camera_yaw = 1;
@@ -57,37 +51,31 @@ public:
 			.finalize();
 	}
 
-	void draw_game_ui() override
+	void draw_game_ui(const pcsx2& ps2, const controller& c, playback& camera_playback) override
 	{
-		ImGui::Text("Freecam (A): "); ImGui::SameLine();
-		ImGui::TextColored(freecam_mode == freecam_mode_type::camera ? ui_colors::on_obvious : ui_colors::off_obvious, freecam_mode == freecam_mode_type::camera ? "ON" : "OFF");
-		ImGui::Text("Pause (X): "); ImGui::SameLine();
-		ImGui::TextColored(pause_flag.is_on() ? ui_colors::on_obvious : ui_colors::off_obvious, pause_flag.is_on() ? "ON" : "OFF");
+		shared_ui::toggle(c, controller_bindings::freecam, camera_flag, "Freecam");
+		shared_ui::toggle(c, controller_bindings::pause, pause_flag, "Pause");
 	}
 
-	void update(const pcsx2& ps2, const controller_state& c, float time_delta) override
+	void update(const pcsx2& ps2, const controller_state& c, playback& camera_playback, float time_delta) override
 	{
 		if (sentinel.has_reset())
 		{
 			pause_flag.reset();
 			camera_flag.reset();
 			camera_values.reset();
-			freecam_mode = freecam_mode_type::none;
 		}
 
-		if (c.button_down(button_type::BUTTON_X))
+		if (c.button_down(controller_bindings::pause))
 		{
 			pause_flag.toggle();
 
 			sentinel.increment();
 		}
 
-		if (c.button_down(button_type::BUTTON_A))
+		if (c.button_down(controller_bindings::freecam))
 		{
-			if (freecam_mode == freecam_mode_type::camera) freecam_mode = freecam_mode_type::none;
-			else freecam_mode = freecam_mode_type::camera;
-
-			if (freecam_mode != freecam_mode_type::none)
+			if (!camera_flag.is_on())
 			{
 				camera_flag.set_on(true);
 				if (!camera_values.currently_tweaking())
@@ -118,7 +106,7 @@ public:
 			const float current_yaw = camera_values.get(camera_yaw);
 			const float current_pitch = -camera_values.get(camera_pitch);
 
-			glm::vec3 pos_delta = shared_utils::compute_freecam_pos_delta(c, glm::vec2(move_scale, -move_scale), current_yaw, current_pitch);
+			glm::vec3 pos_delta = shared_camera::compute_freecam_pos_delta(c, glm::vec2(move_scale, -move_scale), current_yaw, current_pitch);
 
 			camera_values.add(camera_x, pos_delta.x);
 			camera_values.add(camera_y, pos_delta.y);
