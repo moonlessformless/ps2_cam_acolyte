@@ -8,7 +8,7 @@
 #include "glm/geometric.hpp"
 #include <iostream>
 
-class kuon_prototype : public ps2_game
+class kuon : public ps2_game
 {
 private:
 	sentinel_counter sentinel;
@@ -23,7 +23,37 @@ private:
 	static constexpr int camera_z = 4;
 
 public:
-	explicit kuon_prototype(const pcsx2& ps2)
+	explicit kuon(const pcsx2& ps2)
+		: sentinel(ps2, 0x01000000)
+		, camera_flag(ps2)
+		, camera_values(ps2, {
+			0x00325880, // camera pitch
+			0x00325884, // camera yaw
+			0x00325870, // camera x
+			0x00325874, // camera y
+			0x00325878, // camera z
+			})
+		, pause_flag(ps2)
+	{
+		camera_flag.edit_off()
+			.write<int32_t>(0x00133F08, 0x0C04CC40) // 	jal	UpdateCamAnim
+			.finalize();
+		camera_flag.edit_on()
+			.write<int32_t>(0x00133F08, 0x00000000) // jal UpdateCamAnim -> nop
+			.finalize();
+		pause_flag.edit_off()
+			.write<int32_t>(0x00138FD8, 0x0C05E998) // 	jal	PlayDrama
+			.write<int32_t>(0x002132E8, 0x24020001) // 	Menu_TD_IsPlay 	li	v0,0x1
+			.finalize();
+		pause_flag.edit_on()
+			.write<int32_t>(0x00138FD8, 0x00000000) // jal PlayDrama -> nop
+			.write<int32_t>(0x002132E8, 0x8F820004) // 	Menu_TD_IsPlay 	li	v0,0x1 -> lw v0,0x4(gp)
+			.finalize();
+	}
+
+	enum class for_prototype {};
+
+	kuon(const pcsx2& ps2, for_prototype)
 		: sentinel(ps2, 0x01000000)
 		, camera_flag(ps2)
 		, camera_values(ps2, {
@@ -33,7 +63,7 @@ public:
 			0x00325274, // camera y
 			0x00325278, // camera z
 			})
-		, pause_flag(ps2)
+			, pause_flag(ps2)
 	{
 		camera_flag.edit_off()
 			.write<int32_t>(0x00133F08, 0x0C04CC40) // 	jal	UpdateCamAnim
@@ -53,6 +83,7 @@ public:
 
 	void draw_game_ui(const pcsx2& ps2, const controller& c, playback& camera_playback) override
 	{
+		camera_playback.draw_playback_ui(c);
 		shared_ui::toggle(c, controller_bindings::freecam, camera_flag, "Freecam");
 		shared_ui::toggle(c, controller_bindings::pause, pause_flag, "Pause");
 	}
@@ -103,18 +134,33 @@ public:
 			camera_values.add(camera_yaw, c.get_right_axis().first * turn_scale);
 			camera_values.add(camera_pitch, -c.get_right_axis().second * turn_scale);
 
-			const float current_yaw = camera_values.get(camera_yaw);
-			const float current_pitch = -camera_values.get(camera_pitch);
+			float current_yaw = camera_values.get(camera_yaw);
+			float current_pitch = camera_values.get(camera_pitch);
 
-			glm::vec3 pos_delta = shared_camera::compute_freecam_pos_delta(c, glm::vec2(move_scale, -move_scale), current_yaw, current_pitch);
+			glm::vec3 pos_delta = shared_camera::compute_freecam_pos_delta(c, glm::vec2(move_scale, -move_scale), current_yaw, -current_pitch);
+			glm::vec3 pos = glm::vec3(camera_values.get(camera_x), camera_values.get(camera_y), camera_values.get(camera_z)) + pos_delta;
 
-			camera_values.add(camera_x, pos_delta.x);
-			camera_values.add(camera_y, pos_delta.y);
-			camera_values.add(camera_z, pos_delta.z);
+			if (camera_playback.update(time_delta, current_yaw, current_pitch, pos.x, pos.y, pos.z))
+			{
+				camera_values.set(camera_yaw, current_yaw);
+				camera_values.set(camera_pitch, current_pitch);
+			}
+
+			camera_values.set(camera_x, pos.x);
+			camera_values.set(camera_y, pos.y);
+			camera_values.set(camera_z, pos.z);
 
 			camera_values.flush(ps2);
 		}
 	}
 };
 
-ps2_game_static_register<kuon_prototype> r("F7557FA5", "Kuon (Aug 2, 2004 prototype)");
+ps2_game_static_register<kuon> r("9AC63A2E", "Kuon (USA)");
+
+class kuon_prototype : public kuon
+{
+public:
+	explicit kuon_prototype(const pcsx2& ps2) : kuon(ps2, kuon::for_prototype()) {}
+};
+
+ps2_game_static_register<kuon_prototype> r2("F7557FA5", "Kuon (Aug 2, 2004 prototype)");

@@ -59,15 +59,20 @@ public:
 		}
 	}
 
-	static const std::vector<std::string>& list_ps2_games()
+	using ps2_game_info = std::pair<std::string, std::string>; // uuid, game name
+	static const std::vector<ps2_game_info>& list_ps2_games()
 	{
-		static std::vector<std::string> list;
+		static std::vector<ps2_game_info> list;
 		if (list.empty())
 		{
 			list.reserve(name_to_factory().size());
 			std::transform(name_to_factory().begin(), name_to_factory().end(), std::back_inserter(list),
 				[](const auto& pair) {
-					return pair.first + " - " + pair.second.name;
+					return std::pair(pair.first, pair.second.name);
+				});
+			std::erase_if(list, [](const ps2_game_info& i) { return i.first == "00000000"; });
+			std::sort(list.begin(), list.end(), [](const ps2_game_info& a, const ps2_game_info& b) {
+				return a.second < b.second;
 				});
 		}
 		return list;

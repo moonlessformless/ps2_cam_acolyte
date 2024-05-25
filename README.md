@@ -6,13 +6,17 @@ This is a lightweight Windows exe for using camera hacks and other cheats/debugg
 
 Support is currently focused on PS2 horror games(in particular early prototypes), and will expand over time. Every game supports a free cam mode, but some games have other cheats or debugging tools such as disabling shadows or pausing gameplay.
 
-| UUID     | Game                                | Notes                                                        |
-| -------- | ----------------------------------- | ------------------------------------------------------------ |
-| F7557FA5 | Kuon (Aug 2nd Prototype)            | https://hiddenpalace.org/Kuon_(Aug_2,_2004_prototype)        |
-| F3FD313E | Rule of Rose NTSC UC                |                                                              |
-| 6BBD4932 | Silent Hill 2 (Director's Cut) EU   |                                                              |
-| D915592E | Silent Hill 2 (July 13th Prototype) | https://hiddenpalace.org/Silent_Hill_2_(Jul_13,_2001_prototype) |
-| A8D83239 | Silent Hill Origins NTSC UC         |                                                              |
+| UUID     | Game                                  | Notes                                                        |
+| -------- | ------------------------------------- | ------------------------------------------------------------ |
+| 901AAC09 | Haunting Ground (USA)                 |                                                              |
+| F7557FA5 | Kuon (Aug 2nd Prototype)              | https://hiddenpalace.org/Kuon_(Aug_2,_2004_prototype)        |
+| 9AC63A2E | Kuon (USA)                            |                                                              |
+| 053D2239 | Metal Gear Solid 3: Subsistence (USA) |                                                              |
+| F3FD313E | Rule of Rose (USA)                    |                                                              |
+| D915592E | Silent Hill 2 (July 13th Prototype)   | https://hiddenpalace.org/Silent_Hill_2_(Jul_13,_2001_prototype) |
+| 6BBD4932 | Silent Hill 2 (Director's Cut) EU     |                                                              |
+| A8D83239 | Silent Hill Origins (USA)             |                                                              |
+| D6C48447 | Siren (USA)                           |                                                              |
 
 Additional games and functionality for existing games will be added over time.
 
@@ -51,7 +55,7 @@ If you're upgrading from a previous version, copy over the preferences.ini from 
 
 *A:* If your Windows Defender definitions are up to date, it should scan clean, but may trigger on older definitions or other antivirus software. Since it opens a IPC socket to talk to PCSX2 and contains a bunch of hardcoded hex values, it's easy to see why it might look suspicious to an antivirus. I have submitted the exe to several places, i.e. Bitdefender, as a false positive, so perhaps it will clear up in time. If you're concerned, you can inspect the code and build it yourself.
 
-**About the Code**
+### **About the Code**
 
 PS2 Cam Acolyte uses:
 

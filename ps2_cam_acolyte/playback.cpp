@@ -11,6 +11,9 @@ playback::playback()
 void playback::clear()
 {
 	keyframes.clear();
+	playhead = 0;
+	frame_progress = 0.0f;
+	current_mode = mode::none;
 }
 
 void playback::draw_playback_ui(const controller& c)
@@ -53,6 +56,12 @@ void playback::draw_playback_ui(const controller& c)
 	}
 	else if (current_mode == mode::playing)
 	{
+		if (ImGui::Button("Restart"))
+		{
+			playhead = 0;
+			frame_progress = 0.0f;
+		}
+		ImGui::SameLine();
 		if (ImGui::Button("Stop"))
 		{
 			current_mode = mode::none;

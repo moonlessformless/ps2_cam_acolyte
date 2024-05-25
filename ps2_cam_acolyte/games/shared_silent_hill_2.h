@@ -16,7 +16,7 @@ public:
 	static constexpr int camera_y = 3;
 	static constexpr int camera_z = 4;
 
-	static void process_sh2_freecam(const pcsx2& ps2, const controller_state& c,
+	static void process_sh2_freecam(const pcsx2& ps2, const controller_state& c, playback& camera_playback,
 		float time_delta,
 		tweakable_value_set<float, 5>& camera_values,
 		tweakable_value_set<float, 3>& james_position_values)
@@ -27,12 +27,22 @@ public:
 		camera_values.add(camera_yaw, c.get_right_axis().first * turn_scale);
 		camera_values.add(camera_pitch, -c.get_right_axis().second * turn_scale);
 
+		float current_yaw = camera_values.get(camera_yaw);
+		float current_pitch = camera_values.get(camera_pitch);
+
 		glm::vec3 forward;
 		glm::vec3 pos_delta = shared_camera::compute_freecam_pos_delta(c, glm::vec2(move_scale, -move_scale), camera_values.get(camera_yaw), camera_values.get(camera_pitch), &forward);
+		glm::vec3 pos = glm::vec3(camera_values.get(camera_x), camera_values.get(camera_y), camera_values.get(camera_z)) + glm::vec3(pos_delta.x, -pos_delta.y, pos_delta.z);
 
-		camera_values.add(camera_x, pos_delta.x);
-		camera_values.add(camera_y, -pos_delta.y);
-		camera_values.add(camera_z, pos_delta.z);
+		if (camera_playback.update(time_delta, current_yaw, current_pitch, pos.x, pos.y, pos.z))
+		{
+			camera_values.set(camera_yaw, current_yaw);
+			camera_values.set(camera_pitch, current_pitch);
+		}
+
+		camera_values.set(camera_x, pos.x);
+		camera_values.set(camera_y, pos.y);
+		camera_values.set(camera_z, pos.z);
 
 		if (james_position_values.currently_tweaking())
 		{

@@ -42,7 +42,7 @@ private:
 	void determine_game();
 
 public:
-	pcsx2(const controller* controller);
+	explicit pcsx2(const controller* controller);
 	~pcsx2();
 	bool update();
 	PINE::PCSX2* get_ipc() const { return ipc; }

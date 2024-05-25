@@ -96,6 +96,7 @@ public:
 
 	void draw_game_ui(const pcsx2& ps2, const controller& c, playback& camera_playback) override
 	{
+		camera_playback.draw_playback_ui(c);
 		ImGui::PushTextWrapPos(0.0f); ImGui::TextColored(ui_colors::help, "Note: the freecam behaves oddly during cutscenes but can still be moved."); ImGui::PopTextWrapPos();
 		shared_ui::button(c, controller_bindings::freecam); ImGui::SameLine(); ImGui::Text("Freecam: "); ImGui::SameLine();
 		ImGui::TextColored(freecam_mode == freecam_mode_type::camera ? ui_colors::on_obvious : ui_colors::off_obvious, freecam_mode == freecam_mode_type::camera ? "ON" : "OFF");
@@ -139,7 +140,7 @@ public:
 
 		if (camera_values.currently_tweaking())
 		{
-			shared_silent_hill_2::process_sh2_freecam(ps2, c, time_delta, camera_values, james_position_values);
+			shared_silent_hill_2::process_sh2_freecam(ps2, c, camera_playback, time_delta, camera_values, james_position_values);
 		}
 	}
 };

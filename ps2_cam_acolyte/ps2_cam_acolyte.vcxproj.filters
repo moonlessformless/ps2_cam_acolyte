@@ -76,9 +76,6 @@
     <ClCompile Include="games\F3FD313E_rule_of_rose.cpp">
       <Filter>Source Files\games</Filter>
     </ClCompile>
-    <ClCompile Include="games\F7557FA5_kuon_aug_2_prototype.cpp">
-      <Filter>Source Files\games</Filter>
-    </ClCompile>
     <ClCompile Include="games\A8D83239_silent_hill_origins.cpp">
       <Filter>Source Files\games</Filter>
     </ClCompile>
@@ -87,6 +84,18 @@
     </ClCompile>
     <ClCompile Include="playback.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="games\00000000_nothing.cpp">
+      <Filter>Source Files\games</Filter>
+    </ClCompile>
+    <ClCompile Include="games\901AAC09_haunting_ground.cpp">
+      <Filter>Source Files\games</Filter>
+    </ClCompile>
+    <ClCompile Include="games\9AC63A2E_kuon_F7557FA5_kuon_aug_2_prototype.cpp">
+      <Filter>Source Files\games</Filter>
+    </ClCompile>
+    <ClCompile Include="games\053D2239_metal_gear_solid_3.cpp">
+      <Filter>Source Files\games</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

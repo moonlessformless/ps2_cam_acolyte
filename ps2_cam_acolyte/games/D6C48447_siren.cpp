@@ -16,11 +16,24 @@ private:
 	tweakable_value_set<float, 1> brightness_flag;
 	tweakable_value_set<char, 1> freeze_ai_flag;
 	toggle_state camera_flag;
+	read_only_value_set<uint32_t, 1> source_camera_location;
 	read_only_value_set<float, 16> source_camera_matrix;
 	tweakable_value_set<float, 16> final_camera_matrix;
 	float current_yaw = 0.0f;
 	float current_pitch = 0.0f;
 	glm::vec3 current_position = glm::vec3();
+
+	// the source/final camera addresses seem to change bet
+	void update_camera_base_address()
+	{
+		source_camera_location.update();
+		size_t source_base = source_camera_location.get(0);
+		if (source_camera_matrix.get_address(0) != source_base)
+		{
+			source_camera_matrix.update_base_address(source_base);
+			final_camera_matrix.update_base_address(source_base + 112);
+		}
+	}
 
 public:
 	explicit siren(const pcsx2& ps2)
@@ -28,8 +41,9 @@ public:
 		, brightness_flag(ps2, 0x002CD764)
 		, freeze_ai_flag(ps2, 0x1A97DF1)
 		, camera_flag(ps2)
-		, source_camera_matrix(ps2, 0x0C19DF0)
-		, final_camera_matrix(ps2, 0x00C19E60)
+		, source_camera_location(ps2, 0x01000004) // we assemble opcodes to write the source camera base address here when the camera flag is turned on
+		, source_camera_matrix(ps2, 0x00C24E70)
+		, final_camera_matrix(ps2, 0x00C24EE0)
 	{
 		// this stops writes to the final camera matrix - we recompute it ourselves starting from the source_camera_matrix
 		camera_flag.edit_off()
@@ -39,9 +53,9 @@ public:
 			.write<int32_t>(0x00106908, 0xF8840030) // sqc2 vf04, 0x30(a0)
 			.finalize();
 		camera_flag.edit_on()
-			.write<int32_t>(0x001068F8, 0x00000000) // sq t0, 0x0(a0)
-			.write<int32_t>(0x001068FC, 0x00000000) // sq t1, 0x10(a0)
-			.write<int32_t>(0x00106900, 0x00000000) // sq t2, 0x20(a0)
+			.write<int32_t>(0x001068F8, 0x3C080100) // sq t0, 0x0(a0) -> lui t0, 0x0100
+			.write<int32_t>(0x001068FC, 0x35080004) // sq t1, 0x10(a0) -> ori t0, t0, 0x0004
+			.write<int32_t>(0x00106900, 0xAD050000) // sq t2, 0x20(a0) -> sw a1, 0(t0) - writes the base address of the source camera to our secret location 0x01000004
 			.write<int32_t>(0x00106908, 0x00000000) // sqc2 vf04, 0x30(a0)
 			.finalize();
 	}
@@ -101,6 +115,10 @@ public:
 				camera_flag.set_on(true);
 				if (!final_camera_matrix.currently_tweaking())
 				{
+					// hack - give pcsx2 a few frames to assemble the opcode and write the source camera base address, so that when we start tweaking the values are right
+					using namespace std::chrono_literals;
+					std::this_thread::sleep_for(100ms);
+					update_camera_base_address();
 					final_camera_matrix.start_tweaking();
 					source_camera_matrix.update();
 					current_yaw = glm::acos(source_camera_matrix.get(0));
@@ -122,8 +140,10 @@ public:
 
 		if (final_camera_matrix.currently_tweaking())
 		{
-			float turn_scale = time_delta * 3.0f;
-			float move_scale = time_delta * 1000.0f;
+			update_camera_base_address();
+
+			const float turn_scale = time_delta * 3.0f;
+			const float move_scale = time_delta * 1000.0f;
 
 			current_yaw += c.get_right_axis().first * turn_scale;
 			current_pitch += -c.get_right_axis().second * turn_scale;
@@ -180,4 +200,4 @@ public:
 	}
 };
 
-ps2_game_static_register<siren> r("D6C48447", "Siren");
+ps2_game_static_register<siren> r("D6C48447", "Siren (USA)");

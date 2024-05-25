@@ -49,6 +49,7 @@ public:
 
 	void draw_game_ui(const pcsx2& ps2, const controller& c, playback& camera_playback) override
 	{
+		camera_playback.draw_playback_ui(c);
 		shared_ui::toggle(c, controller_bindings::freecam, camera_flag, "Freecam");
 		shared_ui::toggle(c, controller_bindings::lighting, brightness_flag, "Brightness Boost");
 	}
@@ -123,10 +124,13 @@ public:
 				0.0f, 0.0f, 0.0f, 1.0f
 				});
 
-			glm::vec3 pos_delta = shared_camera::compute_freecam_pos_delta(c, glm::vec2(-move_scale, -move_scale), current_yaw, current_pitch);
+			glm::vec3 pos_delta = shared_camera::compute_freecam_pos_delta(c, glm::vec2(-move_scale, -move_scale), current_yaw, -current_pitch);
+			glm::vec3 pos = glm::vec3(camera_matrix_1.get(12), camera_matrix_1.get(13), camera_matrix_1.get(14)) + pos_delta;
+
+			camera_playback.update(time_delta, current_yaw, current_pitch, pos.x, pos.y, pos.z);
 
 			glm::mat4 position_mat(1.0f);
-			position_mat[3] = glm::vec4(camera_matrix_1.get(12) + pos_delta.x, camera_matrix_1.get(13) - pos_delta.y, camera_matrix_1.get(14) + pos_delta.z, 1.0f);
+			position_mat[3] = glm::vec4(pos.x, pos.y, pos.z, 1.0f);
 
 			glm::mat4 final_mat =  position_mat * yaw_mat * pitch_mat;
 
@@ -147,4 +151,4 @@ public:
 	}
 };
 
-ps2_game_static_register<silent_hill_origins> r("A8D83239", "Silent Hill Origins");
+ps2_game_static_register<silent_hill_origins> r("A8D83239", "Silent Hill Origins (USA)");

@@ -74,6 +74,10 @@ bool pcsx2::update()
     {
         current_game->update(*this, controller_ptr->get_state(), camera_playback, time_delta);
     }
+    else
+    {
+        camera_playback.clear();
+    }
 
     if (camera_playback.needs_render())
     {

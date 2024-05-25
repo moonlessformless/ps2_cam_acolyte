@@ -7,9 +7,21 @@ bool game_library_ui_view::is_selectable() const { return true;  }
 const char* game_library_ui_view::selectable_name() const { return "Game Library"; }
 void game_library_ui_view::draw_tool()
 {
-	for (const std::string& s : ps2_game_registry::list_ps2_games())
+    int index = 0;
+	for (const ps2_game_registry::ps2_game_info& s : ps2_game_registry::list_ps2_games())
 	{
-		ImGui::Text(s.c_str());
+        ImGui::PushID(index);
+        if (ImGui::Button("Copy"))
+        {
+            std::string copy_string = s.first + " " + s.second;
+            ImGui::GetIO().SetClipboardTextFn(nullptr, copy_string.c_str());
+        }
+        ImGui::SameLine();
+        ImGui::Text(s.first.c_str());
+        ImGui::SameLine();
+        ImGui::Text(s.second.c_str());
+        ImGui::PopID();
+        ++index;
 	}
 }
 

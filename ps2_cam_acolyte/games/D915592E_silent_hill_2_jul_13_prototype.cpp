@@ -95,6 +95,7 @@ public:
 
 	void draw_game_ui(const pcsx2& ps2, const controller& c, playback& camera_playback) override
 	{
+		camera_playback.draw_playback_ui(c);
 		const char* speed_description = nullptr;
 		switch (speed_flag.current_index())
 		{
@@ -206,7 +207,7 @@ public:
 
 		if (camera_values.currently_tweaking())
 		{
-			shared_silent_hill_2::process_sh2_freecam(ps2, c, time_delta, camera_values, james_position_values);
+			shared_silent_hill_2::process_sh2_freecam(ps2, c, camera_playback, time_delta, camera_values, james_position_values);
 		}
 	}
 };

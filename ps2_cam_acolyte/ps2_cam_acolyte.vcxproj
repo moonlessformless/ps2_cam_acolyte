@@ -150,12 +150,15 @@ copy "$(ProjectDir)\..\third_party\sdl_gamecontrollerdb\gamecontrollerdb.txt" "$
     <ClCompile Include="..\third_party\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\third_party\imgui\imgui_widgets.cpp" />
     <ClCompile Include="controller.cpp" />
+    <ClCompile Include="games\00000000_nothing.cpp" />
+    <ClCompile Include="games\053D2239_metal_gear_solid_3.cpp" />
     <ClCompile Include="games\6BBD4932_silent_hill_2_directors_cut_eu.cpp" />
+    <ClCompile Include="games\901AAC09_haunting_ground.cpp" />
+    <ClCompile Include="games\9AC63A2E_kuon_F7557FA5_kuon_aug_2_prototype.cpp" />
     <ClCompile Include="games\A8D83239_silent_hill_origins.cpp" />
     <ClCompile Include="games\D6C48447_siren.cpp" />
     <ClCompile Include="games\D915592E_silent_hill_2_jul_13_prototype.cpp" />
     <ClCompile Include="games\F3FD313E_rule_of_rose.cpp" />
-    <ClCompile Include="games\F7557FA5_kuon_aug_2_prototype.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="playback.cpp" />
     <ClCompile Include="preferences.cpp" />

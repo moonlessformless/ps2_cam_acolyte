@@ -201,6 +201,23 @@ public:
 	{
 		return v[index].last_value;
 	}
+	
+	uint32_t get_address(size_t index)
+	{
+		return v[index].address;
+	}
+
+	void update_base_address(size_t base_address)
+	{
+		read_all = ps2_ipc_cmd(ps2);
+		for (int i = 0; i < N; ++i)
+		{
+			v[i].address = base_address + i * sizeof(T);
+			v[i].read_cmd = read_all.queue_read<T>(v[i].address);
+		}
+		read_all.finalize();
+		update();
+	}
 };
 
 template <typename T, size_t N>
@@ -320,6 +337,22 @@ public:
 		start_tweaking();
 		stop_tweaking(false);
 	}
+
+	uint32_t get_address(size_t index)
+	{
+		return v[index].address;
+	}
+
+	void update_base_address(size_t base_address)
+	{
+		read_all = ps2_ipc_cmd(ps2);
+		for (int i = 0; i < N; ++i)
+		{
+			v[i].address = base_address + i * sizeof(T);
+			v[i].read_cmd = read_all.queue_read<T>(v[i].address);
+		}
+		read_all.finalize();
+	}
 };
 
 template <size_t N>
@@ -337,12 +370,16 @@ private:
 	const pcsx2& ps2;
 	bool on = false;
 	std::array<restorable_value, N> values;
+	ps2_ipc_cmd on_cmd;
+	ps2_ipc_cmd off_cmd;
 
 public:
 	// tuple is: address, tweaked value, original value
-	restoring_toggle_state(const pcsx2& ps2, const std::array<restorable_value, N>& values)
+	restoring_toggle_state(const pcsx2& ps2, const std::array<restorable_value, N>& v)
 		: ps2(ps2)
-		, values(values)
+		, values(v)
+		, on_cmd(ps2)
+		, off_cmd(ps2)
 	{
 		// this will read the restored values from memory
 		// use for debugging only when in a known clean state
@@ -362,16 +399,26 @@ public:
 				values[i].restored = actual_value;
 			}
 		}*/
+		for (int i = 0; i < N; ++i)
+		{
+			on_cmd.write<uint32_t>(values[i].address, values[i].tweaked);
+		}
+		on_cmd.finalize();
+		for (int i = 0; i < N; ++i)
+		{
+			off_cmd.write<uint32_t>(values[i].address, values[i].restored);
+		}
+		off_cmd.finalize();
 	}
 	void set_on(bool on)
 	{
 		this->on = on;
-		ps2_ipc_cmd cmd(ps2);
-		for (int i = 0; i < N; ++i)
-		{
-			cmd.write<uint32_t>(values[i].address, on ? values[i].tweaked : values[i].restored);
-		}
-		cmd.send();
+		force_send();
+	}
+	void force_send()
+	{
+		if (on) on_cmd.send();
+		else off_cmd.send();
 	}
 	void toggle()
 	{

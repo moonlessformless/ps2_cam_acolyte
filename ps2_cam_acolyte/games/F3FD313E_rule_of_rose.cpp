@@ -84,14 +84,21 @@ public:
 			camera_true_values.update();
 			float true_yaw = camera_true_values.get(camera_true_yaw);
 			float true_pitch = camera_true_values.get(camera_true_pitch);
-			float current_yaw = camera_values.get(camera_yaw) + true_yaw;
-			float current_pitch = camera_values.get(camera_pitch) + true_pitch;
+			float current_yaw = camera_values.get(camera_yaw);
+			float current_pitch = camera_values.get(camera_pitch);
 
-			glm::vec3 pos_delta = shared_camera::compute_freecam_pos_delta(c, glm::vec2(move_scale, -move_scale), current_yaw, current_pitch);
+			glm::vec3 pos_delta = shared_camera::compute_freecam_pos_delta(c, glm::vec2(move_scale, -move_scale), current_yaw + true_yaw, current_pitch + true_pitch);
+			glm::vec3 pos = glm::vec3(camera_values.get(camera_forward), camera_values.get(camera_up), camera_values.get(camera_right)) + glm::vec3(pos_delta.x, -pos_delta.y, pos_delta.z);
 
-			camera_values.add(camera_forward, pos_delta.x);
-			camera_values.add(camera_up, -pos_delta.y);
-			camera_values.add(camera_right, pos_delta.z);
+			if (camera_playback.update(time_delta, current_yaw, current_pitch, pos.x, pos.y, pos.z))
+			{
+				camera_values.set(camera_yaw, current_yaw);
+				camera_values.set(camera_pitch, current_pitch);
+			}
+
+			camera_values.set(camera_forward, pos.x);
+			camera_values.set(camera_up, pos.y);
+			camera_values.set(camera_right, pos.z);
 
 			camera_values.flush(ps2);
 		}
@@ -99,6 +106,7 @@ public:
 
 	void draw_game_ui(const pcsx2& ps2, const controller& c, playback& camera_playback) override
 	{
+		camera_playback.draw_playback_ui(c);
 		const char* speed_description = nullptr;
 		switch (speed_flag.current_index())
 		{
@@ -113,4 +121,4 @@ public:
 	}
 };
 
-ps2_game_static_register<rule_of_rose> r("F3FD313E", "Rule of Rose");
+ps2_game_static_register<rule_of_rose> r("F3FD313E", "Rule of Rose (USA)");
