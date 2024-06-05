@@ -60,35 +60,23 @@ public:
 		if (freecam_mode != freecam_mode_type::none)
 		{
 			camera_flag.set_on(true);
-			if (!camera_values.currently_tweaking())
-			{
-				camera_values.start_tweaking();
-			}
+			camera_values.start_tweaking();
 		}
 		else
 		{
 			camera_flag.set_on(false);
-			if (camera_values.currently_tweaking())
-			{
-				camera_values.stop_tweaking(moving_james_flag.is_on());
-			}
+			camera_values.stop_tweaking(moving_james_flag.is_on());
 		}
 
 		if (freecam_mode == freecam_mode_type::james)
 		{
 			moving_james_flag.set_on(true);
-			if (!james_position_values.currently_tweaking())
-			{
-				james_position_values.start_tweaking();
-			}
+			james_position_values.start_tweaking();
 		}
 		else
 		{
 			moving_james_flag.set_on(false);
-			if (james_position_values.currently_tweaking())
-			{
-				james_position_values.stop_tweaking(false);
-			}
+			james_position_values.stop_tweaking(false);
 		}
 
 		sentinel.increment();

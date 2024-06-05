@@ -123,13 +123,8 @@ public:
 			forward.y = sin(current_pitch);
 			forward.z = cos(current_pitch) * sin(current_yaw);
 
-			camera_values.set(camera_look_x, forward.x);
-			camera_values.set(camera_look_y, forward.y);
-			camera_values.set(camera_look_z, forward.z);
-
-			camera_values.set(camera_x, pos.x);
-			camera_values.set(camera_y, pos.y);
-			camera_values.set(camera_z, pos.z);
+			camera_values.set(camera_look_x, forward);
+			camera_values.set(camera_x, pos);
 
 			camera_values.flush(ps2);
 		}

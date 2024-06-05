@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <cassert>
+#include "glm/vec3.hpp"
+#include "glm/matrix.hpp"
 #include "pine.h"
 
 class pcsx2;
@@ -271,28 +273,32 @@ public:
 
 	void start_tweaking()
 	{
-		assert(!is_tweaking);
-		read_all.send();
-		for (int i = 0; i < N; ++i)
+		if (!is_tweaking)
 		{
-			v[i].last_untweaked_value = read_all.read<T>(v[i].read_cmd);
-			v[i].last_set_value = v[i].last_untweaked_value;
+			read_all.send();
+			for (int i = 0; i < N; ++i)
+			{
+				v[i].last_untweaked_value = read_all.read<T>(v[i].read_cmd);
+				v[i].last_set_value = v[i].last_untweaked_value;
+			}
+			is_tweaking = true;
 		}
-		is_tweaking = true;
 	}
 
 	void stop_tweaking(bool restore_values = true)
 	{
-		assert(is_tweaking);
-		if (restore_values)
+		if (is_tweaking)
 		{
-			for (int i = 0; i < N; ++i)
+			if (restore_values)
 			{
-				v[i].last_set_value = v[i].last_untweaked_value;
+				for (int i = 0; i < N; ++i)
+				{
+					v[i].last_set_value = v[i].last_untweaked_value;
+				}
+				flush(ps2);
 			}
-			flush(ps2);
+			is_tweaking = false;
 		}
-		is_tweaking = false;
 	}
 
 	void toggle_tweaking()
@@ -310,6 +316,26 @@ public:
 	{
 		assert(is_tweaking);
 		v[index].last_set_value = value;
+	}
+
+	void set(size_t index, glm::vec3 v)
+	{
+		set(index + 0, v.x);
+		set(index + 1, v.y);
+		set(index + 2, v.z);
+	}
+
+	void set(size_t index, glm::mat4 m)
+	{
+		int i = 0;
+		for (int y = 0; y < 4; ++y)
+		{
+			for (int x = 0; x < 4; ++x)
+			{
+				set(index + i, m[y][x]);
+				++i;
+			}
+		}
 	}
 
 	void add(size_t index, T delta)

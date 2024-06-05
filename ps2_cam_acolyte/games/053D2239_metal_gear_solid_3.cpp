@@ -126,20 +126,6 @@ public:
 			current_yaw += -c.get_right_axis().first * turn_scale;
 			current_pitch += -c.get_right_axis().second * turn_scale;
 
-			glm::mat4 pitch_mat({
-				1.0f, 0.0f, 0.0f, 0.0f,
-				0.0f, glm::cos(current_pitch), glm::sin(current_pitch), 0.0f,
-				0.0f, -glm::sin(current_pitch), glm::cos(current_pitch), 0.0f,
-				0.0f, 0.0f, 0.0f, 1.0f
-				});
-
-			glm::mat4 yaw_mat({
-				glm::cos(current_yaw), 0.0f, -glm::sin(current_yaw), 0.0f,
-				0.0f, 1.0f, 0.0f, 0.0f,
-				glm::sin(current_yaw), 0.0f, glm::cos(current_yaw), 0.0f,
-				0.0f, 0.0f, 0.0f, 1.0f
-				});
-
 			glm::vec3 pos_delta = shared_camera::compute_freecam_pos_delta(c, glm::vec2(-move_scale, -move_scale), current_yaw, -current_pitch);
 			glm::vec3 pos = glm::vec3(camera_matrix.get(12), camera_matrix.get(13), camera_matrix.get(14)) + pos_delta;
 
@@ -148,17 +134,9 @@ public:
 			glm::mat4 position_mat(1.0f);
 			position_mat[3] = glm::vec4(pos.x, pos.y, pos.z, 1.0f);
 
-			glm::mat4 final_mat = position_mat * yaw_mat * pitch_mat;
+			glm::mat4 final_mat = position_mat * shared_camera::compute_rotation_matrix_y_x(current_yaw, current_pitch);
 
-			int i = 0;
-			for (int y = 0; y < 4; ++y)
-			{
-				for (int x = 0; x < 4; ++x)
-				{
-					camera_matrix.set(i, final_mat[y][x]);
-					++i;
-				}
-			}
+			camera_matrix.set(0, final_mat);
 
 			camera_matrix.flush(ps2);
 		}

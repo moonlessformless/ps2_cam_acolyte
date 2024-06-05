@@ -109,18 +109,12 @@ public:
 			if (!camera_flag.is_on())
 			{
 				camera_flag.set_on(true);
-				if (!camera_values.currently_tweaking())
-				{
-					camera_values.start_tweaking();
-				}
+				camera_values.start_tweaking();
 			}
 			else
 			{
 				camera_flag.set_on(false);
-				if (camera_values.currently_tweaking())
-				{
-					camera_values.stop_tweaking(true);
-				}
+				camera_values.stop_tweaking(true);
 			}
 
 			sentinel.increment();
@@ -146,9 +140,7 @@ public:
 				camera_values.set(camera_pitch, current_pitch);
 			}
 
-			camera_values.set(camera_x, pos.x);
-			camera_values.set(camera_y, pos.y);
-			camera_values.set(camera_z, pos.z);
+			camera_values.set(camera_x, pos);
 
 			camera_values.flush(ps2);
 		}

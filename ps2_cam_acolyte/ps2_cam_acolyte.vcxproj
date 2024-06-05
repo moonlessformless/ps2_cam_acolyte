@@ -152,6 +152,8 @@ copy "$(ProjectDir)\..\third_party\sdl_gamecontrollerdb\gamecontrollerdb.txt" "$
     <ClCompile Include="controller.cpp" />
     <ClCompile Include="games\00000000_nothing.cpp" />
     <ClCompile Include="games\053D2239_metal_gear_solid_3.cpp" />
+    <ClCompile Include="games\3919136D_silent_hill_4.cpp" />
+    <ClCompile Include="games\61A7E622_silent_hill_shattered_memories.cpp" />
     <ClCompile Include="games\6BBD4932_silent_hill_2_directors_cut_eu.cpp" />
     <ClCompile Include="games\901AAC09_haunting_ground.cpp" />
     <ClCompile Include="games\9AC63A2E_kuon_F7557FA5_kuon_aug_2_prototype.cpp" />

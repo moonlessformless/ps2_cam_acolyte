@@ -1,3 +1,12 @@
+**v.03**
+
+Added support for:
+
+| UUID     | Game                                   | Notes |
+| -------- | -------------------------------------- | ----- |
+| 3919136D | Silent Hill 4 - The Room (USA)         |       |
+| 61A7E622 | Silent Hill - Shattered Memories (USA) |       |
+
 **v.02**
 
 Added support for:

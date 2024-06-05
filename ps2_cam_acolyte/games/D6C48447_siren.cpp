@@ -113,26 +113,20 @@ public:
 			if (!camera_flag.is_on())
 			{
 				camera_flag.set_on(true);
-				if (!final_camera_matrix.currently_tweaking())
-				{
-					// hack - give pcsx2 a few frames to assemble the opcode and write the source camera base address, so that when we start tweaking the values are right
-					using namespace std::chrono_literals;
-					std::this_thread::sleep_for(100ms);
-					update_camera_base_address();
-					final_camera_matrix.start_tweaking();
-					source_camera_matrix.update();
-					current_yaw = glm::acos(source_camera_matrix.get(0));
-					current_pitch = glm::asin(source_camera_matrix.get(6));
-					current_position = glm::vec3(source_camera_matrix.get(12), source_camera_matrix.get(13), source_camera_matrix.get(14));
-				}
+				// hack - give pcsx2 a few frames to assemble the opcode and write the source camera base address, so that when we start tweaking the values are right
+				using namespace std::chrono_literals;
+				std::this_thread::sleep_for(100ms);
+				update_camera_base_address();
+				final_camera_matrix.start_tweaking();
+				source_camera_matrix.update();
+				current_yaw = glm::acos(source_camera_matrix.get(0));
+				current_pitch = glm::asin(source_camera_matrix.get(6));
+				current_position = glm::vec3(source_camera_matrix.get(12), source_camera_matrix.get(13), source_camera_matrix.get(14));
 			}
 			else
 			{
 				camera_flag.set_on(false);
-				if (final_camera_matrix.currently_tweaking())
-				{
-					final_camera_matrix.stop_tweaking(true);
-				}
+				final_camera_matrix.stop_tweaking(true);
 			}
 
 			sentinel.increment();
@@ -148,20 +142,6 @@ public:
 			current_yaw += c.get_right_axis().first * turn_scale;
 			current_pitch += -c.get_right_axis().second * turn_scale;
 
-			glm::mat4 yaw_mat({
-				glm::cos(current_yaw), -glm::sin(current_yaw), 0.0f, 0.0f,
-				glm::sin(current_yaw), glm::cos(current_yaw), 0.0f, 0.0f,
-				0.0f, 0.0f, 1.0f, 0.0f,
-				0.0f, 0.0f, 0.0f, 1.0f
-				});
-
-			glm::mat4 pitch_mat({
-				1.0f, 0.0f, 0.0f, 0.0f,
-				0.0f, glm::cos(current_pitch), glm::sin(current_pitch), 0.0f,
-				0.0f, -glm::sin(current_pitch), glm::cos(current_pitch), 0.0f,
-				0.0f, 0.0f, 0.0f, 1.0f
-				});
-
 			if (!camera_playback.update(time_delta, current_yaw, current_pitch, current_position.x, current_position.y, current_position.z))
 			{
 				glm::vec3 pos_delta = shared_camera::compute_freecam_pos_delta(c, glm::vec2(move_scale, -move_scale), current_yaw, current_pitch);
@@ -171,7 +151,7 @@ public:
 			// what follows is a C++ recreation of the mips function at 0x001068A0
 			// which "cooks" the source camera matrix into a special pre-multiplied form
 			// we create a custom source matrix, nop out the final writes of this function, and substitute the results with our own
-			glm::mat4 rotation_matrix = yaw_mat * pitch_mat;
+			glm::mat4 rotation_matrix = shared_camera::compute_rotation_matrix_z_x(current_yaw, current_pitch);
 			rotation_matrix = glm::transpose(rotation_matrix);
 
 			glm::vec4 final_position(0.0f, 0.0f, 0.0f, 0.0f);
@@ -185,15 +165,7 @@ public:
 
 			glm::mat4 final_mat = position_mat * rotation_matrix;
 
-			int i = 0;
-			for (int y = 0; y < 4; ++y)
-			{
-				for (int x = 0; x < 4; ++x)
-				{
-					final_camera_matrix.set(i, final_mat[y][x]);
-					++i;
-				}
-			}
+			final_camera_matrix.set(0, final_mat);
 
 			final_camera_matrix.flush(ps2);
 		}

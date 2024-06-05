@@ -97,6 +97,12 @@
     <ClCompile Include="games\053D2239_metal_gear_solid_3.cpp">
       <Filter>Source Files\games</Filter>
     </ClCompile>
+    <ClCompile Include="games\3919136D_silent_hill_4.cpp">
+      <Filter>Source Files\games</Filter>
+    </ClCompile>
+    <ClCompile Include="games\61A7E622_silent_hill_shattered_memories.cpp">
+      <Filter>Source Files\games</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="controller.h">

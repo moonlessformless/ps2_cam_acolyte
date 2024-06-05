@@ -5,6 +5,7 @@
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 #include "glm/geometric.hpp"
+#include "glm/matrix.hpp"
 
 class shared_camera
 {
@@ -34,5 +35,43 @@ public:
 			(x_delta * right.y) + (y_delta * forward.y),
 			(x_delta * right.x) + (y_delta * forward.x)
 		);
+	}
+
+	static glm::mat4 compute_rotation_matrix_z_x(float current_yaw, float current_pitch)
+	{
+		glm::mat4 yaw_mat({
+			glm::cos(current_yaw), -glm::sin(current_yaw), 0.0f, 0.0f,
+			glm::sin(current_yaw), glm::cos(current_yaw), 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f
+			});
+
+		glm::mat4 pitch_mat({
+			1.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, glm::cos(current_pitch), glm::sin(current_pitch), 0.0f,
+			0.0f, -glm::sin(current_pitch), glm::cos(current_pitch), 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f
+			});
+
+		return yaw_mat * pitch_mat;
+	}
+
+	static glm::mat4 compute_rotation_matrix_y_x(float current_yaw, float current_pitch)
+	{
+		glm::mat4 yaw_mat({
+			glm::cos(current_yaw), 0.0f, -glm::sin(current_yaw), 0.0f,
+			0.0f, 1.0f, 0.0f, 0.0f,
+			glm::sin(current_yaw), 0.0f, glm::cos(current_yaw), 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f
+			});
+
+		glm::mat4 pitch_mat({
+			1.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, glm::cos(current_pitch), glm::sin(current_pitch), 0.0f,
+			0.0f, -glm::sin(current_pitch), glm::cos(current_pitch), 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f
+			});
+
+		return yaw_mat * pitch_mat;
 	}
 };

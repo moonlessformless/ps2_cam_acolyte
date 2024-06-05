@@ -6,23 +6,25 @@ This is a lightweight Windows exe for using camera hacks and other cheats/debugg
 
 Support is currently focused on PS2 horror games(in particular early prototypes), and will expand over time. Every game supports a free cam mode, but some games have other cheats or debugging tools such as disabling shadows or pausing gameplay.
 
-| UUID     | Game                                  | Notes                                                        |
-| -------- | ------------------------------------- | ------------------------------------------------------------ |
-| 901AAC09 | Haunting Ground (USA)                 |                                                              |
-| F7557FA5 | Kuon (Aug 2nd Prototype)              | https://hiddenpalace.org/Kuon_(Aug_2,_2004_prototype)        |
-| 9AC63A2E | Kuon (USA)                            |                                                              |
-| 053D2239 | Metal Gear Solid 3: Subsistence (USA) |                                                              |
-| F3FD313E | Rule of Rose (USA)                    |                                                              |
-| D915592E | Silent Hill 2 (July 13th Prototype)   | https://hiddenpalace.org/Silent_Hill_2_(Jul_13,_2001_prototype) |
-| 6BBD4932 | Silent Hill 2 (Director's Cut) EU     |                                                              |
-| A8D83239 | Silent Hill Origins (USA)             |                                                              |
-| D6C48447 | Siren (USA)                           |                                                              |
+| UUID     | Game                                   | Notes                                                        |
+| -------- | -------------------------------------- | ------------------------------------------------------------ |
+| 901AAC09 | Haunting Ground (USA)                  |                                                              |
+| F7557FA5 | Kuon (Aug 2nd Prototype)               | https://hiddenpalace.org/Kuon_(Aug_2,_2004_prototype)        |
+| 9AC63A2E | Kuon (USA)                             |                                                              |
+| 053D2239 | Metal Gear Solid 3: Subsistence (USA)  |                                                              |
+| F3FD313E | Rule of Rose (USA)                     |                                                              |
+| 61A7E622 | Silent Hill - Shattered Memories (USA) |                                                              |
+| D915592E | Silent Hill 2 (July 13th Prototype)    | https://hiddenpalace.org/Silent_Hill_2_(Jul_13,_2001_prototype) |
+| 6BBD4932 | Silent Hill 2 (Director's Cut) EU      |                                                              |
+| 3919136D | Silent Hill 4 - The Room (USA)         |                                                              |
+| A8D83239 | Silent Hill Origins (USA)              |                                                              |
+| D6C48447 | Siren (USA)                            |                                                              |
 
 Additional games and functionality for existing games will be added over time.
 
 ### **Installation**
 
-Download the latest zip from the Releases, unzip into a directory of your choosing and double-click the .exe.
+Download the latest zip from the Releases(see the sidebar on the GitHub page), unzip into a directory of your choosing and double-click the .exe.
 
 You may see a "Windows protected your PC" pop up about it being an unrecognized app - this is just because it's unsigned code. You can click More info -> Run anyway.
 
