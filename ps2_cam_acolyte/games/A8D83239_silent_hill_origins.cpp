@@ -15,6 +15,7 @@ private:
 	sentinel_counter sentinel;
 	toggle_state camera_flag;
 	toggle_state brightness_flag;
+	tweakable_value_set<char, 1> pause_toggle; // this is a tweakable because we need to continually flush the value
 	tweakable_value_set<float, 16> camera_matrix_1;
 	tweakable_value_set<float, 16> camera_matrix_2;
 	float current_yaw = 0.0f;
@@ -27,6 +28,7 @@ public:
 		, camera_matrix_1(ps2, 0x0091B5F0)
 		, camera_matrix_2(ps2, 0x016E3BD0)
 		, brightness_flag(ps2)
+		, pause_toggle(ps2, 0x00339CEC)
 	{
 		camera_flag.edit_off()
 			.write<int32_t>(0x001133DC, 0x0C0899E8) // jal	pos_004195D0
@@ -52,6 +54,7 @@ public:
 		camera_playback.draw_playback_ui(c);
 		shared_ui::toggle(c, controller_bindings::freecam, camera_flag, "Freecam");
 		shared_ui::toggle(c, controller_bindings::lighting, brightness_flag, "Brightness Boost");
+		shared_ui::toggle(c, controller_bindings::pause, pause_toggle, "Pause");
 	}
 
 	void update(const pcsx2& ps2, const controller_state& c, playback& camera_playback, float time_delta) override
@@ -62,11 +65,27 @@ public:
 			camera_matrix_1.reset();
 			camera_matrix_2.reset();
 			brightness_flag.reset();
+			pause_toggle.reset();
 		}
 
 		if (c.button_down(controller_bindings::lighting))
 		{
 			brightness_flag.toggle();
+			sentinel.increment();
+		}
+
+		if (c.button_down(controller_bindings::pause))
+		{
+			if (!pause_toggle.currently_tweaking())
+			{
+				pause_toggle.start_tweaking();
+			}
+			else
+			{
+				pause_toggle.set(0, 0x00);
+				pause_toggle.flush(ps2);
+				pause_toggle.stop_tweaking();
+			}
 			sentinel.increment();
 		}
 
@@ -88,6 +107,13 @@ public:
 			}
 
 			sentinel.increment();
+		}
+
+		// end of cinematics, etc. can reset this flag, so we keep writing it
+		if (pause_toggle.currently_tweaking())
+		{
+			pause_toggle.set(0, 0x01);
+			pause_toggle.flush(ps2);
 		}
 
 		if (camera_flag.is_on())
