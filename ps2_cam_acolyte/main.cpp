@@ -15,15 +15,16 @@ int main()
     preferences prefs;
     ui_host ui_host;
     ui_main ui_main;
-    controller controller(prefs);
-    pcsx2 ps2(&controller);
+    controller camera_controller(prefs, "controller", "joystick_sensitivity", "joystick_deadzone");
+    controller game_controller(prefs, "game_controller", "game_joystick_sensitivity", "game_joystick_deadzone");
+    pcsx2 ps2(&camera_controller, &game_controller, prefs);
 
     game_library_ui_view game_library_ui;
     about_ui_view about_ui_view;
 
     ui_main.add_tool_view(&ps2);
     ui_main.add_tool_view(&game_library_ui);
-    ui_main.add_tool_view(&controller);
+    ui_main.add_tool_view(&camera_controller);
     ui_main.add_tool_view(&about_ui_view);
 
     std::chrono::high_resolution_clock clock;
@@ -36,7 +37,8 @@ int main()
     {
         auto frame_start_time = clock.now();
 
-        controller.new_frame();
+        camera_controller.new_frame();
+        game_controller.new_frame();
 
         bool render_now = false;
         SDL_Event event;
@@ -57,7 +59,8 @@ int main()
                 render_now = true;
             }
 
-            controller.handle_event(event);
+            camera_controller.handle_event(event);
+			game_controller.handle_event(event);
             ui_host.handle_event(event);
             pending_render_frames = 2; // some events take a frame to play out, so request 2 renders
         }

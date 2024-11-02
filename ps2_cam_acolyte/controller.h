@@ -53,6 +53,8 @@ private:
 	float leftStickY = 0.0f;
 	float rightStickX = 0.0f;
 	float rightStickY = 0.0f;
+	float leftTrigger = 0.0f;
+	float rightTrigger = 0.0f;
 	size_t last_update_frame = 0;
 
 public:
@@ -60,10 +62,13 @@ public:
 	void new_frame();
 	void set_left_axis(float x, float y, float sensitivity, float deadzone);
 	void set_right_axis(float x, float y, float sensitivity, float deadzone);
+	void set_trigger(float left, float right);
 	void set_button_state(button_type, bool currently_down);
 
 	std::pair<float,float> get_left_axis() const;
 	std::pair<float, float> get_right_axis() const;
+	float get_left_trigger() const;
+	float get_right_trigger() const;
 	bool button(button_type) const;
 	bool button_down(button_type) const;
 	bool button_up(button_type) const;
@@ -72,19 +77,23 @@ public:
 class controller : public ui_tool_view
 {
 private:
+	static bool s_sdl_controllers_initialized;
 	preferences& prefs;
 	std::unique_ptr<controller_impl> impl;
 	controller_state state;
 	std::vector<std::string> device_list;
 	float joystick_sensitivity = 1.0f;
 	float joystick_deadzone = 0.25f;
+	const char* prefs_device_name = nullptr;
+	const char* prefs_sensitivity = nullptr;
+	const char* prefs_deadzone = nullptr;
 
 	void refresh_device_list();
 	int sdl_to_device_list_index(int index) const;
 	int device_list_index_to_sdl(int index) const;
 
 public:
-	explicit controller(preferences& prefs);
+	explicit controller(preferences& prefs, const char* prefs_device_index, const char* prefs_sensitivity, const char* prefs_deadzone);
 	~controller();
 	void new_frame();
 	void handle_event(const SDL_Event& event);

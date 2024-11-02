@@ -6,4 +6,4 @@ struct version
 	int minor = 0;
 };
 
-static constexpr version current_version = { 0, 3 };
+static constexpr version current_version = { 0, 4 };

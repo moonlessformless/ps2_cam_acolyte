@@ -318,6 +318,15 @@ public:
 		v[index].last_set_value = value;
 	}
 
+	void set_all(T value)
+	{
+		for (int i = 0; i < N; ++i)
+		{
+			set(i, value);
+		}
+	}
+
+
 	void set(size_t index, glm::vec3 v)
 	{
 		set(index + 0, v.x);

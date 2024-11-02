@@ -28,7 +28,8 @@ public:
 
 private:
 	PINE::PCSX2* ipc = nullptr;
-	const controller* controller_ptr;
+	const controller* camera_controller_ptr;
+	controller* game_controller_ptr;
 	std::unique_ptr<ps2_game> current_game;
 	connection_status status;
 	std::chrono::high_resolution_clock clock;
@@ -38,14 +39,17 @@ private:
 	static constexpr float time_between_game_checks = 0.25f;
 	float time_until_next_game_check = 0.0f;
 	playback camera_playback;
+	preferences& prefs;
 
 	void determine_game();
 
 public:
-	explicit pcsx2(const controller* controller);
+	explicit pcsx2(const controller* camera_controller, controller* game_controller, preferences& prefs);
 	~pcsx2();
 	bool update();
 	PINE::PCSX2* get_ipc() const { return ipc; }
+	preferences& get_prefs() const { return prefs; }
+	controller& get_game_controller() const { return *game_controller_ptr; }
 
 	// ui
 	bool has_status() const override;

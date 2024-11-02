@@ -25,6 +25,8 @@ public:
 		const float x_delta = c.get_left_axis().first * move_joystick_scale.x;
 		const float y_delta = c.get_left_axis().second * move_joystick_scale.y;
 
+		float height_delta = (c.get_right_trigger() - c.get_left_trigger()) * move_joystick_scale.x * 0.5f;
+
 		if (optional_out_forward)
 		{
 			*optional_out_forward = forward;
@@ -32,7 +34,7 @@ public:
 
 		return glm::vec3(
 			(x_delta * right.z) + (y_delta * forward.z),
-			(x_delta * right.y) + (y_delta * forward.y),
+			(x_delta * right.y) + (y_delta * forward.y) + height_delta,
 			(x_delta * right.x) + (y_delta * forward.x)
 		);
 	}

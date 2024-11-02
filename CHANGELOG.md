@@ -1,3 +1,11 @@
+**v.04**
+
+New features:
+
+* As suggested by GitHub user aggugigg, a "modern controls" mode for Silent Hill Origins has been added. To enable, launch Silent Hill Origins as normal and then click the "Modern Controls" checkbox. You can then pick which controller you're using for PCSX2 and play the game with modern over the shoulder third person controls. Camera distance/offset are tunable.
+* As suggested by GitHub user micielk, you can now use L2/R2 to move the camera up and down in all games.
+* Added support for pausing Silent Hill - Shattered Memories.
+
 **v.03**
 
 Added support for:

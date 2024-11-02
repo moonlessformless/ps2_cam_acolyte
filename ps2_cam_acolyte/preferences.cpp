@@ -110,3 +110,36 @@ void preferences::write_float(const char* key, float value)
 		write(key, buffer.data());
 	}
 }
+
+void preferences::write_on_change_float(const char* key, float* value, float target_value)
+{
+	if (*value != target_value)
+	{
+		write_float(key, target_value);
+		*value = target_value;
+	}
+}
+
+bool preferences::read_bool(const char* key, bool default_value) const
+{
+	const char* value = read(key);
+	if (value != nullptr)
+	{
+		return strcmp(value, "true") == 0;
+	}
+	return default_value;
+}
+
+void preferences::write_bool(const char* key, bool value)
+{
+	write(key, value ? "true" : "false");
+}
+
+void preferences::write_on_change_bool(const char* key, bool* value, bool target_value)
+{
+	if (*value != target_value)
+	{
+		write_bool(key, target_value);
+		*value = target_value;
+	}
+}

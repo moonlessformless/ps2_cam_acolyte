@@ -123,7 +123,7 @@ public:
 		if (camera_values.currently_tweaking())
 		{
 			float turn_scale = time_delta * 2.0f;
-			float move_scale = time_delta * 50.0f;
+			float move_scale = time_delta * 25.0f;
 
 			camera_values.add(camera_yaw, c.get_right_axis().first * turn_scale);
 			camera_values.add(camera_pitch, -c.get_right_axis().second * turn_scale);

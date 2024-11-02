@@ -17,7 +17,7 @@ Support is currently focused on PS2 horror games(in particular early prototypes)
 | D915592E | Silent Hill 2 (July 13th Prototype)    | https://hiddenpalace.org/Silent_Hill_2_(Jul_13,_2001_prototype) |
 | 6BBD4932 | Silent Hill 2 (Director's Cut) EU      |                                                              |
 | 3919136D | Silent Hill 4 - The Room (USA)         |                                                              |
-| A8D83239 | Silent Hill Origins (USA)              |                                                              |
+| A8D83239 | Silent Hill Origins (USA)              | Includes additional "modern over the shoulder third person controls" mode |
 | D6C48447 | Siren (USA)                            |                                                              |
 
 Additional games and functionality for existing games will be added over time.
@@ -42,6 +42,8 @@ If you're upgrading from a previous version, copy over the preferences.ini from 
 8. Click on Game - the controls are displayed(note that it currently always uses Xbox terminology, so button X will be displayed instead of Cross)
 9. Start exploring the game world!
 10. Your preferences, i.e. controller selection, are stored in preferences.ini next to the executable
+
+Note: If you're only planning on using the "Modern Controls" mode of Silent Hill Origins, no second controller is required.
 
 ### Troubleshooting
 

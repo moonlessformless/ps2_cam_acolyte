@@ -84,6 +84,8 @@ StyleCopReport.xml
 *.pidb
 *.svclog
 *.scc
+*.recipe
+*.idb
 
 # Chutzpah Test files
 _Chutzpah*
@@ -383,4 +385,3 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-ps2_cam_acolyte/imgui.ini

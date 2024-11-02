@@ -149,6 +149,12 @@ void controller_state::set_right_axis(float x, float y, float sensitivity, float
     rightStickY = add_dead_zone(y, sensitivity, deadzone);
 }
 
+void controller_state::set_trigger(float left, float right)
+{
+	leftTrigger = left;
+	rightTrigger = right;
+}
+
 void controller_state::set_button_state(button_type t, bool currently_down)
 {
     button_states[(size_t)t].down = currently_down;
@@ -163,6 +169,16 @@ std::pair<float, float> controller_state::get_left_axis() const
 std::pair<float, float> controller_state::get_right_axis() const
 {
     return { rightStickX, rightStickY };
+}
+
+float controller_state::get_left_trigger() const
+{
+    return leftTrigger;
+}
+
+float controller_state::get_right_trigger() const
+{
+    return rightTrigger;
 }
 
 bool controller_state::button(button_type t) const
@@ -186,19 +202,28 @@ public:
     SDL_GameController* game_controller = nullptr;
 };
 
-controller::controller(preferences& prefs)
+bool controller::s_sdl_controllers_initialized = false;
+
+controller::controller(preferences& prefs, const char* prefs_device_name, const char* prefs_sensitivity, const char* prefs_deadzone)
     : prefs(prefs)
     , impl(new controller_impl)
+	, prefs_device_name(prefs_device_name)
+	, prefs_sensitivity(prefs_sensitivity)
+	, prefs_deadzone(prefs_deadzone)
 {
-    SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
+    if (!s_sdl_controllers_initialized)
+    {
+        SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
+        s_sdl_controllers_initialized = true;
+    }
 
-    joystick_sensitivity = prefs.read_float("joystick_sensitivity", joystick_sensitivity);
-    joystick_deadzone = prefs.read_float("joystick_deadzone", joystick_deadzone);
+    joystick_sensitivity = prefs.read_float(prefs_sensitivity, joystick_sensitivity);
+    joystick_deadzone = prefs.read_float(prefs_deadzone, joystick_deadzone);
 
     bool found_previous = false;
     if (SDL_NumJoysticks() > 0)
     {
-        const char* previous = prefs.read("controller");
+        const char* previous = prefs.read(prefs_device_name);
         if (previous != nullptr)
         {
             for (int i = 0; i < SDL_NumJoysticks(); ++i)
@@ -254,12 +279,12 @@ void controller::use_device(int device_list_index)
 
     if (index < 0 || index >= SDL_NumJoysticks())
     {
-        prefs.write("controller", "none");
+        prefs.write(prefs_device_name, "none");
         return;
     }
 
     impl->game_controller = SDL_GameControllerOpen(index);
-    prefs.write("controller", SDL_JoystickPathForIndex(index));
+    prefs.write(prefs_device_name, SDL_JoystickPathForIndex(index));
 }
 
 void controller::refresh_device_list()
@@ -296,6 +321,9 @@ void controller::new_frame()
         xMove = SDL_GameControllerGetAxis(impl->game_controller, SDL_CONTROLLER_AXIS_RIGHTX);
         yMove = SDL_GameControllerGetAxis(impl->game_controller, SDL_CONTROLLER_AXIS_RIGHTY);
         state.set_right_axis(to_float(xMove), to_float(yMove), joystick_sensitivity, joystick_deadzone);
+        int16_t leftMove = SDL_GameControllerGetAxis(impl->game_controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT);
+        int16_t rightMove = SDL_GameControllerGetAxis(impl->game_controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
+		state.set_trigger(to_float(leftMove), to_float(rightMove));
     }
 }
 
@@ -304,11 +332,17 @@ void controller::handle_event(const SDL_Event& e)
 {
     if (e.type == SDL_CONTROLLERBUTTONDOWN)
     {
-        state.set_button_state((button_type)e.cbutton.button, true);
+        if (e.cbutton.which == SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(impl->game_controller)))
+        {
+            state.set_button_state((button_type)e.cbutton.button, true);
+        }
     }
     else if (e.type == SDL_CONTROLLERBUTTONUP)
     {
-        state.set_button_state((button_type)e.cbutton.button, false);
+        if (e.cbutton.which == SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(impl->game_controller)))
+        {
+            state.set_button_state((button_type)e.cbutton.button, false);
+        }
     }
     else if (e.type == SDL_JOYDEVICEADDED || e.type == SDL_JOYDEVICEREMOVED)
     {
@@ -412,7 +446,7 @@ void controller::draw_tool()
         ImGui::SliderFloat("Joystick Sensitivity", &joystick_sensitivity, 0.1f, 5.0f, "%.2f");
         if (joystick_sensitivity != initial_sensitivity)
         {
-            prefs.write_float("joystick_sensitivity", joystick_sensitivity);
+            prefs.write_float(prefs_sensitivity, joystick_sensitivity);
         }
 
         float initial_deadzone = joystick_deadzone;
@@ -420,7 +454,7 @@ void controller::draw_tool()
         ImGui::SliderFloat("Joystick Deadzone", &joystick_deadzone, 0.0f, 1.0f, "%.2f");
         if (joystick_deadzone != initial_deadzone)
         {
-            prefs.write_float("joystick_deadzone", joystick_deadzone);
+            prefs.write_float(prefs_deadzone, joystick_deadzone);
         }
 
         int current = get_current_device_index();
